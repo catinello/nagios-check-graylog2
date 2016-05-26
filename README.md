@@ -44,5 +44,5 @@ Nagios return codes are used.
 
 [&copy; Antonino Catinello][HOME] - [BSD-License][BSD]
 
-[MIT]:https://github.com/catinello/nagios-check-graylog2/blob/master/LICENSE
+[BSD]:https://github.com/catinello/nagios-check-graylog2/blob/master/LICENSE
 [HOME]:http://antonino.catinello.eu
