@@ -32,6 +32,7 @@ Just download the archive and extract the binary to your drive.
 
 ##Examples:##
 
+    # OK
     $ ./check_graylog2 -l http://localhost:12900 -u USERNAME -p PASSWORD
     OK - Service is running!
     768764376 total events processed
@@ -39,6 +40,14 @@ Just download the archive and extract the binary to your drive.
     297 throughput
     1 sources
     Check took 94ms|time=0.0094;;;; total=768764376;;;; sources=1;;;; throughput=297;;;; index_failures=0;;;;
+
+    # CRITICAL
+    $ ./check_graylog2 -l http://localhost:12900 -u USERNAME -p PASSWORD
+    CRITICAL - Can not connect to Graylog2 API|time=0.000000;;;; total=0;;;; sources=0;;;; throughput=0;;;; index_failures=0;;;;
+
+    # UNKNOWN
+    $ ./check_graylog2 -l https://localhost -insecure -u USERNAME -p PASSWORD
+    UNKNOWN - Port number is missing. Try https://hostname:port|time=0.000000;;;; total=0;;;; sources=0;;;; throughput=0;;;; index_failures=0;;;;
 
 ##Return Values:##
 
