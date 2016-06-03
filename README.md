@@ -14,7 +14,8 @@ Binary packages are available for linux (x86_64) and windows (x86_64) in the [re
 Just download the archive and extract the binary to your drive.
 
     # instruction on linux
-    $ tar -xvf check_graylog2-16.vkJomP-linux-amd64.tar.xz -C /#path#to#/#your#/nagios/libexec/ check_graylog2
+    $ curl -O https://github.com/catinello/nagios-check-graylog2/releases/download/16.vkXMDT/check_graylog2-16.vkXMDT-linux-amd64.tar.xz
+    $ tar -xvf check_graylog2-16.vkXMDT-linux-amd64.tar.xz -C /#path#to#/#your#/nagios/libexec/ check_graylog2
 
 ##Usage:##
 
