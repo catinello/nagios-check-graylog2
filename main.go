@@ -165,6 +165,7 @@ func query(target string, user string, pass string) map[string]interface{} {
 
 	req, err := http.NewRequest("GET", target, nil)
 	req.SetBasicAuth(user, pass)
+	req.Header.Set("Accept", "application/json")
 
 	res, err := client.Do(req)
 	if err != nil {
