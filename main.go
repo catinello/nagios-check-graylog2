@@ -105,7 +105,7 @@ func parse(link *string) string {
 		quit(UNKNOWN, "Only HTTP is supported as protocol.", err)
 	}
 
-	return l.Scheme + "://" + l.Host
+	return l.Scheme + "://" + l.Host + l.Path
 }
 
 func main() {
