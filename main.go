@@ -105,7 +105,7 @@ func parse(link *string) string {
 		quit(UNKNOWN, "Only HTTP is supported as protocol.", err)
 	}
 
-	return l.Scheme + "://" + l.Host
+	return l.Scheme + "://" + l.Host + l.Path
 }
 
 func main() {
@@ -165,6 +165,7 @@ func query(target string, user string, pass string) map[string]interface{} {
 
 	req, err := http.NewRequest("GET", target, nil)
 	req.SetBasicAuth(user, pass)
+	req.Header.Set("Accept", "application/json")
 
 	res, err := client.Do(req)
 	if err != nil {
