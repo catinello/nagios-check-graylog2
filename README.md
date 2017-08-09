@@ -11,13 +11,14 @@ Nagios Graylog2 checks via REST API the availability of the service.
   - index failures
   - and the actual throughput.
 
-This plugin is written in standard Go which means there are no third party libraries used and it is plattform independant. It can compile on all available Go architecutres and operating systems (Linux, *BSD, Mac OS X, Windows).
+This plugin is written in standard Go which means there are no third party libraries used and it is plattform independant. It can compile on all available Go architectures and operating systems (Linux, *BSD, Mac OS X, Windows, ...).
 
 ## Installation: 
 
-Just download the source and build it yourself.
+Just download the source and build it yourself using the go-tools.
 
     $ go get github.com/catinello/nagios-check-graylog2
+    $ mv $GOPATH/bin/nagios-check-graylog2 check_graylog2
 
 ## Usage:
 
@@ -35,7 +36,7 @@ Just download the source and build it yourself.
 
 ## Debugging:
 
-Please try your command with the environment variable set as `NCG2=debug` or prefixing your command on linux.
+Please try your command with the environment variable set as `NCG2=debug` or prefixing your command for example on linux like this.
 
     NCG2=debug /usr/local/nagios/libexec/check_graylog2 -l http://localhost:9000/api/ -u USERNAME -p PASSWORD
 
@@ -64,7 +65,7 @@ Nagios return codes are used.
     2 = CRITICAL
     3 = UNKNOWN
 
-##License:##
+## License:
 
 &copy; [Antonino Catinello][HOME] - [BSD-License][BSD]
 
