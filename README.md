@@ -3,21 +3,23 @@ nagios-check-graylog2
 
 Nagios Graylog2 checks via REST API the availability of the service. 
 
-Is the service processing data? How long does the check take? We monitor performance through the number of data sources, total of processed messages, index failures and the actual throughput.
+- Is the service processing data?
+- How long does the check take?
+- Monitoring performance
+  - through the number of data sources,
+  - total processed messages, 
+  - index failures
+  - and the actual throughput.
 
 This plugin is written in standard Go which means there are no third party libraries used and it is plattform independant. It can compile on all available Go architecutres and operating systems (Linux, *BSD, Mac OS X, Windows).
 
-##Installation:##
+## Installation: 
 
-Binary packages are available for linux (x86_64) and windows (x86_64) in the [release section][RELEASES].
+Just download the source and build it yourself.
 
-Just download the archive and extract the binary to your drive.
+    $ go get github.com/catinello/nagios-check-graylog2
 
-    # instruction on linux
-    $ curl -O https://github.com/catinello/nagios-check-graylog2/releases/download/16.vkXMDT/check_graylog2-16.vkXMDT-linux-amd64.tar.xz
-    $ tar -xvf check_graylog2-16.vkXMDT-linux-amd64.tar.xz -C /#path#to#/#your#/nagios/libexec/ check_graylog2
-
-##Usage:##
+## Usage:
 
     check_graylog2
       -l string
@@ -31,7 +33,13 @@ Just download the archive and extract the binary to your drive.
       -version
             Display version and license information.
 
-##Examples:##
+## Debugging:
+
+Please try your command with the environment variable set as `NCG2=debug` or prefixing your command on linux.
+
+    NCG2=debug /usr/local/nagios/libexec/check_graylog2 -l http://localhost:9000/api/ -u USERNAME -p PASSWORD
+
+## Examples:
 
     $ ./check_graylog2 -l http://localhost:12900 -u USERNAME -p PASSWORD
     OK - Service is running!
@@ -47,7 +55,7 @@ Just download the archive and extract the binary to your drive.
     $ ./check_graylog2 -l https://localhost -insecure -u USERNAME -p PASSWORD
     UNKNOWN - Port number is missing. Try https://hostname:port|time=0.000000;;;; total=0;;;; sources=0;;;; throughput=0;;;; index_failures=0;;;;
 
-##Return Values:##
+## Return Values:
 
 Nagios return codes are used.
 
@@ -61,5 +69,5 @@ Nagios return codes are used.
 &copy; [Antonino Catinello][HOME] - [BSD-License][BSD]
 
 [BSD]:https://github.com/catinello/nagios-check-graylog2/blob/master/LICENSE
-[HOME]:http://antonino.catinello.eu
-[RELEASES]:https://github.com/catinello/nagios-check-graylog2/releases
+[HOME]:https://antonino.catinello.eu
+
