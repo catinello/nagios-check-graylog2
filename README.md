@@ -62,7 +62,7 @@ Please try your command with the environment variable set as `NCG2=debug` or pre
     UNKNOWN - Port number is missing. Try https://hostname:port|time=0.000000;;;; total=0;;;; sources=0;;;; throughput=0;;;; index_failures=0;;;;
     
      $ ./check_graylog2 -l http://localhost:12900 -u USERNAME -p PASSWORD -w 10 -c 20
-    CRITICAL - Indexer Failure Critical!
+    CRITICAL - Index Failure above Critical Limit!
     Service is running
     533732628 total events processed
     21 index failures
