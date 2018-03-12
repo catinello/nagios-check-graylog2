@@ -23,6 +23,8 @@ Just download the source and build it yourself using the go-tools.
 ## Usage:
 
     check_graylog2
+      -c string
+          	Index Critical Limit
       -l string
             Graylog2 API URL (default "http://localhost:12900")
       -p string
@@ -33,28 +35,42 @@ Just download the source and build it yourself using the go-tools.
             Accept insecure SSL/TLS certificates.
       -version
             Display version and license information.
-
+      -w string
+            Index Error Limit
+ 
 ## Debugging:
 
 Please try your command with the environment variable set as `NCG2=debug` or prefixing your command for example on linux like this.
 
-    NCG2=debug /usr/local/nagios/libexec/check_graylog2 -l http://localhost:9000/api/ -u USERNAME -p PASSWORD
+    NCG2=debug /usr/local/nagios/libexec/check_graylog2 -l http://localhost:9000/api/ -u USERNAME -p PASSWORD -w 10 -c 20
 
 ## Examples:
 
-    $ ./check_graylog2 -l http://localhost:12900 -u USERNAME -p PASSWORD
+    $ ./check_graylog2 -l http://localhost:12900 -u USERNAME -p PASSWORD -w 10 -c 20
     OK - Service is running!
     768764376 total events processed
     0 index failures
     297 throughput
     1 sources
-    Check took 94ms|time=0.0094;;;; total=768764376;;;; sources=1;;;; throughput=297;;;; index_failures=0;;;;
+    Check took 94ms
+    |time=0.0094;;;; total=768764376;;;; sources=1;;;; throughput=297;;;; index_failures=0;;;;
 
-    $ ./check_graylog2 -l http://localhost:12900 -u USERNAME -p PASSWORD
+    $ ./check_graylog2 -l http://localhost:12900 -u USERNAME -p PASSWORD -w 10 -c 20
     CRITICAL - Can not connect to Graylog2 API|time=0.000000;;;; total=0;;;; sources=0;;;; throughput=0;;;; index_failures=0;;;;
 
-    $ ./check_graylog2 -l https://localhost -insecure -u USERNAME -p PASSWORD
+    $ ./check_graylog2 -l https://localhost -insecure -u USERNAME -p PASSWORD -w 10 -c 20
     UNKNOWN - Port number is missing. Try https://hostname:port|time=0.000000;;;; total=0;;;; sources=0;;;; throughput=0;;;; index_failures=0;;;;
+    
+     $ ./check_graylog2 -l http://localhost:12900 -u USERNAME -p PASSWORD -w 10 -c 20
+    CRITICAL - Indexer Failure Critical!
+    Service is running
+    533732628 total events processed
+    21 index failures
+    297 throughput
+    1 sources
+    Check took 94ms
+    |time=0.0094;;;; total=533732628;;;; sources=1;;;; throughput=297;;;; index_failures=21;;;;
+
 
 ## Return Values:
 
