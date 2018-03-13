@@ -154,12 +154,15 @@ func main() {
 	total := query(c+"/count/total", *user, *pass)
 
 	elapsed := time.Since(start)
-
+	
+	//convert indexwarn and indexcrit strings to float64 for comparison below 
 	indexwarn2, err := strconv.ParseFloat((*indexwarn), 64)
 	if err != nil {
+		quit(UNKNOWN, "Can not parse index warning errors.", err)
 	}
 	indexcrit2, err := strconv.ParseFloat((*indexcrit), 64)
 	if err != nil {
+		quit(UNKNOWN, "Can not parse index critical errors.", err)
 	}
 
 	if index["total"].(float64) < indexwarn2 && index["total"].(float64) < indexcrit2 {
