@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -26,18 +27,18 @@ const DEBUG = "NCG2"
 
 // license information
 const (
-        author = "Antonino Catinello"
-        license = "BSD"
-        year = "2016"
-        copyright = "\u00A9"
+	author       = "Antonino Catinello"
+	license      = "BSD"
+	year         = "2016"
+	copyright    = "\u00A9"
+	contributers = "kahluagenie, theherodied"
 )
-
 
 var (
 	// command line arguments
-	link *string
-	user *string
-	pass *string
+	link    *string
+	user    *string
+	pass    *string
 	version *bool
 	// using ssl to avoid name conflict with tls
 	ssl *bool
@@ -46,7 +47,9 @@ var (
 	// performence data
 	pdata string
 	// version value
-	id string
+	id        string
+	indexwarn *string
+	indexcrit *string
 )
 
 // handle performence data output
@@ -56,13 +59,15 @@ func perf(elapsed, total, inputs, tput, index float64) {
 
 // handle args
 func init() {
-	link = flag.String("l", "http://localhost:12900", "Graylog2 API URL")
+	link = flag.String("l", "http://localhost:12900", "Graylog API URL")
 	user = flag.String("u", "", "API username")
 	pass = flag.String("p", "", "API password")
 	ssl = flag.Bool("insecure", false, "Accept insecure SSL/TLS certificates.")
 	version = flag.Bool("version", false, "Display version and license information.")
 	debug = os.Getenv(DEBUG)
 	perf(0, 0, 0, 0, 0)
+	indexwarn = flag.String("w", "", "Index Error Limit")
+	indexcrit = flag.String("c", "", "Index Critical Limit")
 }
 
 // return nagios codes on quit
@@ -112,11 +117,19 @@ func main() {
 	flag.Parse()
 
 	if *version {
-		fmt.Printf("Version: %v License: %v %v %v %v\n", id, license, copyright, year, author)
+		fmt.Printf("Version: %v License: %v %v %v %v\nContributers: %v\n", id, license, copyright, year, author, contributers)
 		os.Exit(3)
 	}
 
 	if len(*user) == 0 || len(*pass) == 0 {
+		flag.PrintDefaults()
+		os.Exit(3)
+	}
+	if len(*indexwarn) == 0 {
+		flag.PrintDefaults()
+		os.Exit(3)
+	}
+	if len(*indexcrit) == 0 {
 		flag.PrintDefaults()
 		os.Exit(3)
 	}
@@ -142,12 +155,35 @@ func main() {
 
 	elapsed := time.Since(start)
 
-	perf(elapsed.Seconds(), total["events"].(float64), inputs["total"].(float64), tput["throughput"].(float64), index["total"].(float64))
-	quit(OK, fmt.Sprintf("Service is running!\n%.f total events processed\n%.f index failures\n%.f throughput\n%.f sources\nCheck took %v",
-		total["events"].(float64), index["total"].(float64), tput["throughput"].(float64), inputs["total"].(float64), elapsed), nil)
+	// convert indexwarn and indexcrit strings to float64 variables for comparison below
+	indexwarn2, err := strconv.ParseFloat((*indexwarn), 64)
+	if err != nil {
+		quit(UNKNOWN, "Can not parse index warning errors.", err)
+	}
+	indexcrit2, err := strconv.ParseFloat((*indexcrit), 64)
+	if err != nil {
+		quit(UNKNOWN, "Can not parse index critical errors.", err)
+	}
+
+	if index["total"].(float64) < indexwarn2 && index["total"].(float64) < indexcrit2 {
+		perf(elapsed.Seconds(), total["events"].(float64), inputs["total"].(float64), tput["throughput"].(float64), index["total"].(float64))
+		quit(OK, fmt.Sprintf("Service is running!\n%.f total events processed\n%.f index failures\n%.f throughput\n%.f sources\nCheck took %v\n",
+			total["events"].(float64), index["total"].(float64), tput["throughput"].(float64), inputs["total"].(float64), elapsed), nil)
+	}
+	if index["total"].(float64) >= indexwarn2 && index["total"].(float64) < indexcrit2 {
+		perf(elapsed.Seconds(), total["events"].(float64), inputs["total"].(float64), tput["throughput"].(float64), index["total"].(float64))
+		quit(WARNING, fmt.Sprintf("Index Failure above Warning Limit!\nService is running\n%.f total events processed\n%.f index failures\n%.f throughput\n%.f sources\nCheck took %v\n",
+			total["events"].(float64), index["total"].(float64), tput["throughput"].(float64), inputs["total"].(float64), elapsed), nil)
+	}
+	if index["total"].(float64) >= indexcrit2 {
+		perf(elapsed.Seconds(), total["events"].(float64), inputs["total"].(float64), tput["throughput"].(float64), index["total"].(float64))
+		quit(CRITICAL, fmt.Sprintf("Index Failure above Critical Limit!\nService is running\n%.f total events processed\n%.f index failures\n%.f throughput\n%.f sources\nCheck took %v\n",
+			total["events"].(float64), index["total"].(float64), tput["throughput"].(float64), inputs["total"].(float64), elapsed), nil)
+	}
+
 }
 
-// call Graylog2 HTTP API
+// call Graylog HTTP API
 func query(target string, user string, pass string) map[string]interface{} {
 	var client *http.Client
 	var data map[string]interface{}
@@ -169,13 +205,13 @@ func query(target string, user string, pass string) map[string]interface{} {
 
 	res, err := client.Do(req)
 	if err != nil {
-		quit(CRITICAL, "Can not connect to Graylog2 API", err)
+		quit(CRITICAL, "Can not connect to Graylog API", err)
 	}
 	defer res.Body.Close()
 
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		quit(CRITICAL, "No response received from Graylog2 API", err)
+		quit(CRITICAL, "No response received from Graylog API", err)
 	}
 
 	if len(debug) != 0 {
@@ -184,11 +220,11 @@ func query(target string, user string, pass string) map[string]interface{} {
 
 	err = json.Unmarshal(body, &data)
 	if err != nil {
-		quit(UNKNOWN, "Can not parse JSON from Graylog2 API", err)
+		quit(UNKNOWN, "Can not parse JSON from Graylog API", err)
 	}
 
 	if res.StatusCode != 200 {
-		quit(CRITICAL, fmt.Sprintf("Graylog2 API replied with HTTP code %v", res.StatusCode), err)
+		quit(CRITICAL, fmt.Sprintf("Graylog API replied with HTTP code %v", res.StatusCode), err)
 	}
 
 	return data
