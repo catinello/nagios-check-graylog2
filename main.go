@@ -66,8 +66,8 @@ func init() {
 	version = flag.Bool("version", false, "Display version and license information.")
 	debug = os.Getenv(DEBUG)
 	perf(0, 0, 0, 0, 0)
-	indexwarn = flag.String("w", "", "Index Error Limit")
-	indexcrit = flag.String("c", "", "Index Critical Limit")
+	indexwarn = flag.String("w", "", "Index error warning limit.")
+	indexcrit = flag.String("c", "", "Index error critical limit.")
 }
 
 // return nagios codes on quit
@@ -99,11 +99,11 @@ func quit(status int, message string, err error) {
 func parse(link *string) string {
 	l, err := url.Parse(*link)
 	if err != nil {
-		quit(UNKNOWN, "Can not parse given URL.", err)
+		quit(UNKNOWN, "Cannot parse given URL.", err)
 	}
 
 	if !strings.Contains(l.Host, ":") {
-		quit(UNKNOWN, "Port number is missing. Try "+l.Scheme+"://hostname:port", err)
+		quit(UNKNOWN, "Port number is missing. Please try "+l.Scheme+"://hostname:port", err)
 	}
 
 	if !strings.HasPrefix(l.Scheme, "HTTP") && !strings.HasPrefix(l.Scheme, "http") {
@@ -158,11 +158,11 @@ func main() {
 	// convert indexwarn and indexcrit strings to float64 variables for comparison below
 	indexwarn2, err := strconv.ParseFloat((*indexwarn), 64)
 	if err != nil {
-		quit(UNKNOWN, "Can not parse index warning errors.", err)
+		quit(UNKNOWN, "Cannot parse given index warning error value.", err)
 	}
 	indexcrit2, err := strconv.ParseFloat((*indexcrit), 64)
 	if err != nil {
-		quit(UNKNOWN, "Can not parse index critical errors.", err)
+		quit(UNKNOWN, "Cannot parse given index critical error value.", err)
 	}
 
 	if index["total"].(float64) < indexwarn2 && index["total"].(float64) < indexcrit2 {
@@ -205,7 +205,7 @@ func query(target string, user string, pass string) map[string]interface{} {
 
 	res, err := client.Do(req)
 	if err != nil {
-		quit(CRITICAL, "Can not connect to Graylog API", err)
+		quit(CRITICAL, "Cannot connect to Graylog API", err)
 	}
 	defer res.Body.Close()
 
@@ -220,7 +220,7 @@ func query(target string, user string, pass string) map[string]interface{} {
 
 	err = json.Unmarshal(body, &data)
 	if err != nil {
-		quit(UNKNOWN, "Can not parse JSON from Graylog API", err)
+		quit(UNKNOWN, "Cannot parse JSON from Graylog API", err)
 	}
 
 	if res.StatusCode != 200 {
