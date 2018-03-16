@@ -29,7 +29,7 @@ const DEBUG = "NCG2"
 const (
 	author       = "Antonino Catinello"
 	license      = "BSD"
-	year         = "2016"
+	year         = "2016 - 2018"
 	copyright    = "\u00A9"
 	contributers = "kahluagenie, theherodied"
 )
