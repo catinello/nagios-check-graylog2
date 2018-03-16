@@ -122,6 +122,7 @@ func main() {
 	}
 
 	if len(*user) == 0 || len(*pass) == 0 {
+		fmt.Println("API Username/Password is mandatory.")
 		flag.PrintDefaults()
 		os.Exit(3)
 	}
