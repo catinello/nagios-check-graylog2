@@ -62,12 +62,12 @@ func init() {
 	link = flag.String("l", "http://localhost:12900", "Graylog API URL")
 	user = flag.String("u", "", "API username")
 	pass = flag.String("p", "", "API password")
-	ssl = flag.Bool("insecure", false, "Accept insecure SSL/TLS certificates.")
-	version = flag.Bool("version", false, "Display version and license information.")
+	ssl = flag.Bool("insecure", false, "Accept insecure SSL/TLS certificates. (optional)")
+	version = flag.Bool("version", false, "Display version and license information. (info)")
 	debug = os.Getenv(DEBUG)
 	perf(0, 0, 0, 0, 0)
-	indexwarn = flag.String("w", "", "Index error warning limit.")
-	indexcrit = flag.String("c", "", "Index error critical limit.")
+	indexwarn = flag.String("w", "", "Index error warning limit. (optional)")
+	indexcrit = flag.String("c", "", "Index error critical limit. (optional)")
 }
 
 // return nagios codes on quit
@@ -126,14 +126,6 @@ func main() {
 		flag.PrintDefaults()
 		os.Exit(3)
 	}
-	if len(*indexwarn) == 0 {
-		flag.PrintDefaults()
-		os.Exit(3)
-	}
-	if len(*indexcrit) == 0 {
-		flag.PrintDefaults()
-		os.Exit(3)
-	}
 
 	c := parse(link)
 	start := time.Now()
@@ -156,6 +148,15 @@ func main() {
 
 	elapsed := time.Since(start)
 
+	// generate performance data output
+	perf(elapsed.Seconds(), total["events"].(float64), inputs["total"].(float64), tput["throughput"].(float64), index["total"].(float64))
+
+	// fix for backwards compatiblity if no index error threshold is set
+	if len(*indexwarn) == 0 || len(*indexcrit) == 0 {
+		quit(OK, fmt.Sprintf("Service is running!\n%.f total events processed\n%.f index failures\n%.f throughput\n%.f sources\nCheck took %v\n",
+			total["events"].(float64), index["total"].(float64), tput["throughput"].(float64), inputs["total"].(float64), elapsed), nil)
+	}
+
 	// convert indexwarn and indexcrit strings to float64 variables for comparison below
 	indexwarn2, err := strconv.ParseFloat((*indexwarn), 64)
 	if err != nil {
@@ -165,9 +166,6 @@ func main() {
 	if err != nil {
 		quit(UNKNOWN, "Cannot parse given index critical error value.", err)
 	}
-
-	// generate performance data output
-	perf(elapsed.Seconds(), total["events"].(float64), inputs["total"].(float64), tput["throughput"].(float64), index["total"].(float64))
 
 	// handle index thresholds
 	if index["total"].(float64) < indexwarn2 && index["total"].(float64) < indexcrit2 {

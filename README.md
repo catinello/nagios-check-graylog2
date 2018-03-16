@@ -24,20 +24,20 @@ Just download the source and build it yourself using the go-tools.
 
     check_graylog2
       -c string
-          	Index Critical Limit
+            Index error critical limit. (optional)
+      -insecure
+            Accept insecure SSL/TLS certificates. (optional)
       -l string
-            Graylog2 API URL (default "http://localhost:12900")
+            Graylog API URL (default "http://localhost:12900")
       -p string
             API password
       -u string
             API username
-      -insecure
-            Accept insecure SSL/TLS certificates.
       -version
-            Display version and license information.
+            Display version and license information. (info)
       -w string
-            Index Error Limit
- 
+            Index error warning limit. (optional)
+
 ## Debugging:
 
 Please try your command with the environment variable set as `NCG2=debug` or prefixing your command for example on linux like this.
