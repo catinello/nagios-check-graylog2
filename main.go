@@ -50,6 +50,7 @@ var (
 	id        string
 	indexwarn *string
 	indexcrit *string
+
 )
 
 // handle performence data output
@@ -157,6 +158,28 @@ func main() {
 			total["events"].(float64), index["total"].(float64), tput["throughput"].(float64), inputs["total"].(float64), elapsed), nil)
 	}
 
+	if strings.HasSuffix((*indexcrit), "%") && strings.HasSuffix((*indexcrit), "%") {
+		percentage := index["total"].(float64)/total["events"].(float64)
+		// convert indexwarn and indexcrit strings to float64 variables for comparison below
+		indexwarn2, err := strconv.ParseFloat((*indexwarn)[:len(*indexwarn)-1], 64)
+		if err != nil {
+			quit(UNKNOWN, "Cannot parse given index warning error value (percentage)", err)
+		}
+		indexcrit2, err := strconv.ParseFloat((*indexcrit)[:len(*indexcrit)-1], 64)
+		if err != nil {
+			quit(UNKNOWN, "Cannot parse given index critical error value (percentage)", err)
+		}
+		if percentage*100 > indexcrit2 {
+			quit(CRITICAL, fmt.Sprintf("Index Failure above Critical Limit!\nService is running\n%.f total events processed\n%.f index failures\n%.f throughput\n%.f sources\nCheck took %v\n",
+				total["events"].(float64), index["total"].(float64), tput["throughput"].(float64), inputs["total"].(float64), elapsed), nil)
+		}
+		if percentage*100 > indexwarn2 {
+			quit(WARNING, fmt.Sprintf("Index Failure above Warning Limit!\nService is running\n%.f total events processed\n%.f index failures\n%.f throughput\n%.f sources\nCheck took %v\n",
+				total["events"].(float64), index["total"].(float64), tput["throughput"].(float64), inputs["total"].(float64), elapsed), nil)
+		}
+		quit(OK, fmt.Sprintf("Service is running!\n%.f total events processed\n%.f index failures\n%.f throughput\n%.f sources\nCheck took %v\n",
+			total["events"].(float64), index["total"].(float64), tput["throughput"].(float64), inputs["total"].(float64), elapsed), nil)
+	}
 	// convert indexwarn and indexcrit strings to float64 variables for comparison below
 	indexwarn2, err := strconv.ParseFloat((*indexwarn), 64)
 	if err != nil {
