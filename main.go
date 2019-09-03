@@ -163,11 +163,11 @@ func main() {
 		// convert indexwarn and indexcrit strings to float64 variables for comparison below
 		indexwarn2, err := strconv.ParseFloat((*indexwarn)[0:len(*indexwarn)-2], 64)
 		if err != nil {
-			quit(UNKNOWN, "Cannot parse given index warning error value.", err)
+			quit(UNKNOWN, "Cannot parse given index warning error value (percentage)", err)
 		}
 		indexcrit2, err := strconv.ParseFloat((*indexcrit)[0:len(*indexcrit)-2], 64)
 		if err != nil {
-			quit(UNKNOWN, "Cannot parse given index critical error value.", err)
+			quit(UNKNOWN, "Cannot parse given index critical error value (percentage)", err)
 		}
 		if percentage*100 > indexcrit2 {
 			quit(CRITICAL, fmt.Sprintf("Index Failure above Critical Limit!\nService is running\n%.f total events processed\n%.f index failures\n%.f throughput\n%.f sources\nCheck took %v\n",
