@@ -157,6 +157,19 @@ func main() {
 			total["events"].(float64), index["total"].(float64), tput["throughput"].(float64), inputs["total"].(float64), elapsed), nil)
 	}
 
+	if strings.HasSuffix(*indexwarn, "%") && strings.HasSuffix(*indexcrit, "%") {
+		percentage = index["total"].(float64)/total["events"].(float64)
+		if percentage > strconv.ParseFloat((*indexcrit)[0:len(indexcrit)-2], 64) {
+			quit(CRITICAL, fmt.Sprintf("Index Failure above Critical Limit!\nService is running\n%.f total events processed\n%.f index failures\n%.f throughput\n%.f sources\nCheck took %v\n",
+				total["events"].(float64), index["total"].(float64), tput["throughput"].(float64), inputs["total"].(float64), elapsed), nil)
+		}
+		if percentage > strconv.ParseFloat((*indexwarn)[0:len(indexwarn)-2], 64) {
+			quit(WARNING, fmt.Sprintf("Index Failure above Warning Limit!\nService is running\n%.f total events processed\n%.f index failures\n%.f throughput\n%.f sources\nCheck took %v\n",
+				total["events"].(float64), index["total"].(float64), tput["throughput"].(float64), inputs["total"].(float64), elapsed), nil)
+		}
+		quit(OK, fmt.Sprintf("Service is running!\n%.f total events processed\n%.f index failures\n%.f throughput\n%.f sources\nCheck took %v\n",
+			total["events"].(float64), index["total"].(float64), tput["throughput"].(float64), inputs["total"].(float64), elapsed), nil)
+	}
 	// convert indexwarn and indexcrit strings to float64 variables for comparison below
 	indexwarn2, err := strconv.ParseFloat((*indexwarn), 64)
 	if err != nil {
