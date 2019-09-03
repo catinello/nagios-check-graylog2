@@ -161,11 +161,11 @@ func main() {
 	if strings.HasSuffix((*indexcrit), "%") && strings.HasSuffix((*indexcrit), "%") {
 		percentage := index["total"].(float64)/total["events"].(float64)
 		// convert indexwarn and indexcrit strings to float64 variables for comparison below
-		indexwarn2, err := strconv.ParseFloat((*indexwarn)[0:len(*indexwarn)-2], 64)
+		indexwarn2, err := strconv.ParseFloat((*indexwarn)[:len(*indexwarn)-1], 64)
 		if err != nil {
 			quit(UNKNOWN, "Cannot parse given index warning error value (percentage)", err)
 		}
-		indexcrit2, err := strconv.ParseFloat((*indexcrit)[0:len(*indexcrit)-2], 64)
+		indexcrit2, err := strconv.ParseFloat((*indexcrit)[:len(*indexcrit)-1], 64)
 		if err != nil {
 			quit(UNKNOWN, "Cannot parse given index critical error value (percentage)", err)
 		}
